@@ -77,6 +77,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		        	 if (mensaje.getText().trim().length() == 0) {
 		 				return;
 		 			}
+		        	 
 		 			
 		 			String texto = nombre + ">" + mensaje.getText();
 		 			try {
@@ -105,6 +106,38 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 
 		
 		botonSalir.addActionListener(this);
+		mensaje.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
+					String texto = " >Abandona el chat..." + nombre;
+					try {
+						fsalida.writeUTF(texto);
+						fsalida.writeUTF("*");
+						repetir = false;
+						
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+	        		 System.exit(0);
+	        	 }
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		socket = s;
@@ -146,6 +179,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 				fsalida.writeUTF(texto);
 				fsalida.writeUTF("*");
 				repetir = false;
+				
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -186,7 +220,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		}
 
 		try {
-			s = new Socket("192.168.26.122", puerto);
+			s = new Socket("192.168.26.124", puerto);
 
 ///////
 
