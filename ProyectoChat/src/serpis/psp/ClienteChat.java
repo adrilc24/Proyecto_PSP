@@ -2,6 +2,8 @@ package serpis.psp;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -67,6 +69,41 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 
 		textarea1.setEditable(false);
 		botonEnviar.addActionListener(this);
+		
+		mensaje.addKeyListener(new KeyListener() {
+			
+			public void keyPressed(KeyEvent e) {
+		         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+		        	 if (mensaje.getText().trim().length() == 0) {
+		 				return;
+		 			}
+		 			
+		 			String texto = nombre + ">" + mensaje.getText();
+		 			try {
+		 				mensaje.setText("");
+		 				fsalida.writeUTF(texto);
+
+		 			} catch (IOException e1) {
+		 				e1.printStackTrace();
+		 			}
+		 		}
+			}
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+
+		
 		botonSalir.addActionListener(this);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
@@ -149,14 +186,16 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		}
 
 		try {
-			s = new Socket("localhost", puerto);
+			s = new Socket("192.168.26.122", puerto);
 
 ///////
 
-//167
+//167		
+			
 			ClienteChat cliente = new ClienteChat(s, nombre);
 			cliente.setBounds(0, 0, 540, 400);
 			cliente.setVisible(true);
+			
 			new Thread(cliente).start(); // Lanzar hilo cliente
 
 		} catch (IOException e) {
