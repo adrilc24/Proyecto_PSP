@@ -7,6 +7,8 @@ import java.awt.event.KeyListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -188,11 +190,24 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 
 	public void run() {
 		String texto = "";
-
+		String mencion = "@"+nombre;
+		String mensajeEntrada;
+		String mensajeSalida="";
+		ArrayList<String> mensajes = new ArrayList<String>();
 		while (repetir) {
-			try {
-				texto = fentrada.readUTF();
-				textarea1.setText(texto);
+			try {				
+				mensajeEntrada = fentrada.readUTF();
+				if(mensajeEntrada.contains("@")) {
+					if(mensajeEntrada.contains(mencion)) {
+						mensajes.add(mensajeEntrada);
+					}	
+				}else {					
+					 mensajes.add(mensajeEntrada);					
+				}
+				for (String s:mensajes) {
+					mensajeSalida = s;
+				}				
+				textarea1.setText(mensajeSalida);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(null, "IMPOSIBLE CONECTAR CON EL SERVIDOR\n" + e.getMessage(),
 						"<<MENSAJE DE ERROR:2>>", JOptionPane.ERROR_MESSAGE);
@@ -220,7 +235,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		}
 
 		try {
-			s = new Socket("192.168.26.124", puerto);
+			s = new Socket("192.168.26.150", puerto);
 
 ///////
 
