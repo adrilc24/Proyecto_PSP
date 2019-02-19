@@ -161,6 +161,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
+					
 					String texto = " >Abandona el chat..." + nombre;
 					try {
 						fsalida.writeUTF(texto);
@@ -218,7 +219,13 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 
 		if (e.getSource() == botonSalir) {
 			String texto = " >Abandona el chat..." + nombre;
-
+			for(int i=0; i<ListaNombres.size(); i++) {
+				if(ListaNombres.get(i).equals(nombre)) {
+					remove(nombre);
+					save();
+					
+				}
+			}
 			try {
 				fsalida.writeUTF(texto);
 				fsalida.writeUTF("*");
@@ -270,7 +277,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		
 		
 		//cerrarSesion
-		remove(nombre);
+		//remove(nombre);
 		
 		boolean permiso=false;
 		
@@ -286,13 +293,14 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 			permiso=true;
 			
 		}catch(Exception e) {
+			permiso=false;
 			JOptionPane.showMessageDialog(null, "Usuario Ya Registrado\n" + e.getMessage(),
 					"<<MENSAJE DE ERROR:1>>", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		
 		
-		if(permiso=true) {
+		if(permiso==true) {
 			try {
 				s = new Socket("localhost", puerto);
 
