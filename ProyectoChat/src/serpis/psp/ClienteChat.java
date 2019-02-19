@@ -7,6 +7,14 @@ import java.awt.event.KeyListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -48,7 +56,43 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 	JButton botonEnviar = new JButton("Enviar");
 	JButton botonSalir = new JButton("Salir");
 	boolean repetir = true;
+	private static final String filePath = "listanombre.lst";
+	static List<String> ListaNombres; // = new ArrayList<String>();
+	
+	
+	public static void init( ) {
+		Path path = FileSystems.getDefault().getPath(filePath);
+		try {
+			Files.write(path, new ArrayList<String>(), StandardOpenOption.CREATE);
+			ListaNombres = Files.readAllLines(path);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("e:" + e);
+		}
+	}
+	
+	public static void save() {
+		Path path = FileSystems.getDefault().getPath(filePath);
+		try {
+			Files.write(path, ListaNombres, StandardOpenOption.TRUNCATE_EXISTING);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("e:" + e);
+		}
+	}
 
+	public static void remove(String nombre) {
+		Path path = FileSystems.getDefault().getPath(filePath);
+		try {
+			ListaNombres = Files.readAllLines(path);
+			ListaNombres.remove(nombre);
+			Files.write(path, ListaNombres, StandardOpenOption.TRUNCATE_EXISTING);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("e:" + e);
+		}
+	}
+	
 //constructor
 	public ClienteChat(Socket s, String nombre) {
 		super("CONEXION DEL CLIENTE CHAT: " + nombre);
@@ -211,6 +255,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 	public static void main(String args[]) {
 		int puerto = 44444;
 		Socket s = null;
+		init();
 
 		String nombre = JOptionPane.showInputDialog("Introduce tu nombre aquí: ");
 
@@ -219,22 +264,49 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 			return;
 		}
 
+		// if (ListaNombres.contains(nombre)) //ya ta
+		//registrarInicioSesion
+		
+		
+		
+		//cerrarSesion
+		remove(nombre);
+		
+		boolean permiso=false;
+		
 		try {
-			s = new Socket("192.168.26.124", puerto);
+			for(int i=0; i<ListaNombres.size(); i++) {
+				if(ListaNombres.get(i).equals(nombre)) {
+					throw new Exception("");
+				}
+			}
 
-///////
-
-//167		
+			ListaNombres.add(nombre);
+			save();
+			permiso=true;
 			
-			ClienteChat cliente = new ClienteChat(s, nombre);
-			cliente.setBounds(0, 0, 540, 400);
-			cliente.setVisible(true);
-			
-			new Thread(cliente).start(); // Lanzar hilo cliente
-
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "IMPOSIBLE CONECTAR CON EL SERVIDOR\n" + e.getMessage(),
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Usuario Ya Registrado\n" + e.getMessage(),
 					"<<MENSAJE DE ERROR:1>>", JOptionPane.ERROR_MESSAGE);
 		}
+		
+		
+		
+		if(permiso=true) {
+			try {
+				s = new Socket("localhost", puerto);
+
+				ClienteChat cliente = new ClienteChat(s, nombre);
+				cliente.setBounds(0, 0, 540, 400);
+				cliente.setVisible(true);
+				
+				new Thread(cliente).start(); // Lanzar hilo cliente
+
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "IMPOSIBLE CONECTAR CON EL SERVIDOR\n" + e.getMessage(),
+						"<<MENSAJE DE ERROR:1>>", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		
 	}// main
 }// Cliente Chat
